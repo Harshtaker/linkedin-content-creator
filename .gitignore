@@ -10,3 +10,6 @@ __pycache__/
 # IDE / OS files
 .DS_Store
 *.log
+# Ignore sensitive files
+.env
+*.env
