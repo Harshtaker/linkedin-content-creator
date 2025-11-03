@@ -1,67 +1,100 @@
 # 💼 LinkedIn Content Creator
 
-A **fast, free, and hybrid LinkedIn post generator** built with Streamlit.  
-Generates professional, motivational, or educational LinkedIn posts **instantly**, with optional AI enhancement for better text quality. Hashtags are generated automatically.  
+An AI-powered **LinkedIn post generator and scheduler** built with **Streamlit**, designed to help professionals, students, and creators generate high-quality LinkedIn posts, hashtags, and weekly content plans effortlessly.
 
 ---
 
-## **Features**
+## 🚀 Features
 
-- **Fast Offline Generation:** Uses template-based text for instant post creation.  
-- **Optional AI Enhancement:** Enhance your post using lightweight AI (DistilGPT-2 via Hugging Face API) for more natural output.  
-- **Word Length Control:**  
-  - Short → ~30 words  
-  - Medium → ~50 words  
-  - Long → ~80 words  
-- **Automatic Hashtags:** Extracts relevant hashtags from your post.  
-- **Download Button:** Export post + hashtags as `.txt`.  
-- **Clean UI:** Streamlit app, user-friendly, and fully responsive.
+### 🧠 AI Post Generator
+- Generate professional, friendly, motivational, or educational LinkedIn posts.
+- Supports multiple profiles (Professional, Student, Entrepreneur, Marketer, Developer).
+- Automatically suggests trending hashtags.
+- Fetches a relevant image for your topic using **Stable Diffusion (via Hugging Face Diffusers)**.
+
+### 📅 Content Planner
+- Enter up to 7 topics and get a **weekly LinkedIn posting plan**.
+- Suggests best posting times based on your profile type.
+- Easy-to-read weekly schedule displayed directly in the app.
+
+### 🗓️ Post Scheduler
+- Schedule and manage your LinkedIn posts.
+- Optionally auto-generate post content + hashtags.
+- Download your schedule as **CSV** or **DOCX** files for offline access.
 
 ---
 
-## **Installation**
+## 🧩 Tech Stack
 
-1. Clone this repository:
+| Category | Technology |
+|-----------|-------------|
+| Frontend | [Streamlit](https://streamlit.io) |
+| Backend | Python |
+| AI Model | [OpenRouter](https://openrouter.ai) (Mixtral 8x7B) |
+| Image Generation | Hugging Face Diffusers (Stable Diffusion) |
+| File Export | Python-docx, Pandas |
+| Environment Management | Virtualenv / venv |
 
+---
+
+## ⚙️ Installation & Setup
+
+### 1️⃣ Clone this repository
 ```bash
-git clone https://github.com/yourusername/linkedin-content-creator.git
+git clone https://github.com/Harshtaker/linkedin-content-creator.git
 cd linkedin-content-creator
 
-2.Create a virtual environment (recommended):
+2️⃣ Create a virtual environment
 python -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
+venv\Scripts\activate  # On Windows
+# or
+source venv/bin/activate  # On Mac/Linux
 
-3.Install dependencies:
+3️⃣ Install dependencies
 pip install -r requirements.txt
 
-Usage
+4️⃣ Set up environment variables
+Create a .env file in the project root and add your keys (example below):
+OPENROUTER_API_KEY=your_openrouter_api_key
+HUGGINGFACE_TOKEN=your_huggingface_token
 
-Run the Streamlit app:
+
+🔒 These keys are kept safe and not pushed to GitHub (listed in .gitignore).
+
+5️⃣ Run the app
 streamlit run app.py
 
-Enter Topic, Profile, Tone, Length.
-Optional: Check Enhance with AI for AI-paraphrased posts.
-Click Generate Post → see post + hashtags.
-Download as .txt using the download button
+Then open the provided local URL (e.g. http://localhost:8501) in your browser.
 
-Testing Data (Examples)
-| Topic                    | Profile               | Tone         | Length |
-| ------------------------ | --------------------- | ------------ | ------ |
-| AI in startups           | Student, Entrepreneur | Motivational | Short  |
-| Team collaboration       | Developer, Manager    | Professional | Medium |
-| Personal growth lessons  | Student               | Motivational | Long   |
-| Remote work productivity | Professional          | Educational  | Medium |
-| Learning from failure    | Entrepreneur          | Motivational | Short  |
-
-Project Structure
+📁 Project Structure
 linkedin-content-creator/
 │
-├── app.py                 # Streamlit main app
-├── requirements.txt       # Python dependencies
+├── app.py                    # Main Streamlit app
+├── config.py                 # Configuration (reads from .env)
+├── requirements.txt          # Dependencies
+│
 ├── utils/
-│   ├── generator.py       # Post generator (offline + optional API)
-│   ├── hashtags.py        # Hashtag extractor
-│   └── prompt_templates.py# Post templates
-├── README.md
-└── LICENSE
+│   ├── generator.py          # OpenRouter-based text generation
+│   ├── hashtags.py           # Hashtag generator logic
+│   ├── image_fetch.py        # Hugging Face Diffusers image fetch
+│   └── calendar.py           # Weekly scheduler & best time logic
+│
+└── data/                     # (Optional) local cache or post data
+
+🧾 Example Usage
+
+Enter your topic (e.g. “Power of Networking”).
+Choose tone, profile type, and length.
+Click Generate Post → AI creates your post, hashtags, and image.
+Plan your week under 📅 Content Planner tab.
+Download your post plan in CSV/DOCX format.
+
+🤝 Contributing
+Feel free to fork, improve, and create pull requests!
+If you find bugs or want new features, open an Issue.
+
+🧑‍💻 Author
+
+Harsh Shukla
+Built with ❤️ using OpenRouter + Streamlit
+📧 https://github.com/Harshtaker
