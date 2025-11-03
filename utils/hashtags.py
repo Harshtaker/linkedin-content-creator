@@ -1,10 +1,12 @@
-import re
+# utils/hashtags.py
+import yake
 
 def generate_hashtags(text, max_hashtags=5):
-    words = re.findall(r'\b[a-zA-Z]{4,}\b', text.lower())
-    common = ["the", "this", "that", "have", "from", "about", "with", "what", "when"]
-    keywords = [w for w in words if w not in common]
-    hashtags = list(dict.fromkeys(["#" + w for w in keywords]))[:max_hashtags]
-    if not hashtags:
-        hashtags = ["#motivation", "#learning", "#growth"]
-    return hashtags
+    kw_extractor = yake.KeywordExtractor(lan="en", n=1, dedupLim=0.9, top=max_hashtags)
+    keywords = kw_extractor.extract_keywords(text)
+    tags = []
+    for kw, score in keywords:
+        tag = "".join(ch for ch in kw.strip().lower() if ch.isalnum())
+        if tag:
+            tags.append("#" + tag)
+    return tags if tags else ["#insight", "#learning"]

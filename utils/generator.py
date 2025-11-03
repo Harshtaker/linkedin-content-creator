@@ -1,83 +1,44 @@
-import random
+# utils/generator.py
 import requests
-from .prompt_templates import TEMPLATES
+from config import TEXT_API_KEY, TEXT_API_URL, MODEL_NAME
 
-# -------------------------
-# Offline Template Generator
-# -------------------------
-def _expand_text(base, length):
-    extra_phrases = [
-        "It’s amazing how small steps can lead to big results.",
-        "Every experience brings new insights and opportunities.",
-        "Curiosity and consistency always pay off in the long run.",
-        "Collaboration and learning are key to success.",
-        "Growth happens when you challenge yourself and adapt."
-    ]
-    if length == "Short":
-        return base
-    elif length == "Medium":
-        return base + " " + " ".join(random.sample(extra_phrases, 2))
-    elif length == "Long":
-        return base + " " + " ".join(random.sample(extra_phrases, 4))
-    return base
+API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-def simple_template_generator(topic, profile, tone, length):
-    hooks = [
-        "Here's a quick thought:",
-        "Reflecting today:",
-        "Sharing a small insight:",
-        "A learning from recent work:"
-    ]
-    bodies = [
-        f"While working on {topic}, I realized small consistent actions lead to big results.",
-        f"{topic} taught me that adaptability matters more than perfect planning.",
-        f"Exploring {topic} reminded me that persistence and curiosity always pay off."
-    ]
-    ctas = [
-        "Would love to hear your thoughts!",
-        "What are your experiences?",
-        "Share your perspective below."
-    ]
-    text = f"{random.choice(hooks)} {random.choice(bodies)} {random.choice(ctas)}"
-    text = _expand_text(text, length)
-    # Ensure precise word count
-    words = text.split()
-    target = {"Short": 30, "Medium": 50, "Long": 80}.get(length, 50)
-    if len(words) < target:
-        text += " " + " ".join(random.choices(words, k=target - len(words)))
-    elif len(words) > target + 10:
-        text = " ".join(words[:target])
-    return text.strip()
+headers = {
+    "Authorization": f"Bearer {TEXT_API_KEY}",
+    "Content-Type": "application/json"
+}
 
-# -------------------------
-# Optional API Enhancer
-# -------------------------
-HUGGINGFACE_API_URL = "https://api-inference.huggingface.co/models/distilgpt2"
-HUGGINGFACE_TOKEN = ""  # Optional: your Hugging Face token
+def generate_post(topic, profile="Professional", tone="Professional", length="Medium"):
+    """
+    Generates a LinkedIn-style post using OpenRouter API with contextual info.
+    """
+    length_map = {"Short": 40, "Medium": 70, "Long": 100}
+    max_words = length_map.get(length, 70)
 
-def enhance_with_api(text):
-    if not HUGGINGFACE_TOKEN:
-        return text  # skip enhancement if no token
-    headers = {"Authorization": f"Bearer {HUGGINGFACE_TOKEN}"}
-    data = {"inputs": text, "parameters": {"max_new_tokens": 50}}
+    prompt = f"""
+    Search about "{topic}" on the internet and write a detailed, engaging LinkedIn post (~{max_words} words).
+    Maintain a {tone} tone and write from a {profile} perspective.
+    Include a small intro, insight, and a short CTA at the end.
+    Use proper LinkedIn formatting (line breaks, emojis optional).
+    """
+
+    payload = {
+        "model": "gpt-4o-mini",  # or "mistralai/mistral-7b-instruct"
+        "messages": [{"role": "user", "content": prompt}],
+        "temperature": 0.8,
+    }
+
     try:
-        response = requests.post(HUGGINGFACE_API_URL, headers=headers, json=data, timeout=5)
-        result = response.json()
-        if isinstance(result, list) and "generated_text" in result[0]:
-            return result[0]["generated_text"]
-        return text
-    except Exception as e:
-        print("API enhancement failed:", e)
-        return text
+        response = requests.post(API_URL, headers=headers, json=payload, timeout=40)
+        response.raise_for_status()
+        data = response.json()
 
-# -------------------------
-# Public Generator Function
-# -------------------------
-def generate_post(topic, profile="Professional", tone="Motivational", length="Medium", enhance=False):
-    # 1️⃣ Offline template generation (fast)
-    text = simple_template_generator(topic, profile, tone, length)
-    
-    # 2️⃣ Optional API enhancement
-    if enhance:
-        text = enhance_with_api(text)
-    return text
+        if "choices" in data and len(data["choices"]) > 0:
+            text = data["choices"][0]["message"]["content"].strip()
+            return text
+        else:
+            return "Couldn't generate a detailed post, please try again."
+    except Exception as e:
+        print("Error generating post:", e)
+        return "AI post generation failed. Please check your API key or try again."

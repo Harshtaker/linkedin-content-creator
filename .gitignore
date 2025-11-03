@@ -1,0 +1,12 @@
+# Virtual environment
+venv/
+.env/
+
+# Streamlit cache
+.streamlit/
+__pycache__/
+*.pyc
+
+# IDE / OS files
+.DS_Store
+*.log
